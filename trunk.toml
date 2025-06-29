@@ -1,0 +1,6 @@
+[serve]
+port = 8080
+
+[[hooks]]
+stage = "pre_build"
+command = "./scripts/pre_tasks.bat"

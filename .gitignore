@@ -1,0 +1,11 @@
+target
+.env
+.vscode
+_*
+*.bk
+static
+note.md
+node_modules
+run.sh
+todo.md
+dist
