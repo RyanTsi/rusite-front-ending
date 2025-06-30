@@ -4,7 +4,6 @@ target
 _*
 *.bk
 static
-note.md
 node_modules
 run.sh
 todo.md
