@@ -4,3 +4,10 @@ port = 8080
 [[hooks]]
 stage = "pre_build"
 command = "./scripts/pre_tasks.bat"
+public_url = "/public"
+
+[build]
+target = "index.html"
+dist = "dist"
+public_url = "/"
+filehash = true
