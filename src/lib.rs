@@ -5,3 +5,4 @@ pub mod pages;
 pub mod models;
 pub mod state;
 pub mod utils;
+pub mod config;

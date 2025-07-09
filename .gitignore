@@ -8,3 +8,5 @@ node_modules
 run.sh
 todo.md
 dist
+
+config.rs

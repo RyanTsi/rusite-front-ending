@@ -14,6 +14,18 @@ pub struct Article {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ArticleInfo {
+    pub aid: String,
+    pub title: String,
+    pub summary: String,
+    pub secret: Option<String>,
+    pub tags: Vec<String>,
+    pub categories: Vec<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArticleCreateRequest {
     pub title: String,
     pub tags: Vec<String>,

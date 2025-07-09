@@ -1,10 +1,36 @@
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
+use crate::{api::blog::get_articles_list, models::blog::ArticleInfo};
+
 #[component]
-pub fn ArticleList() -> impl IntoView { 
+pub fn ArticleList() -> impl IntoView {
+    let (articlelist, set_articlelist) = signal(Vec::<ArticleInfo>::new());
+    let async_data = LocalResource::new(move || get_articles_list());
+    let async_result = move || {
+        async_data
+            .get()
+            .map(|value| format!("Server returned {value:?}"))
+            // This loading state will only show before the first load
+            .unwrap_or_else(|| "Loading...".into())
+    };
     view! {
-        <h1>"Blog"</h1>
+        <h1 class="text-2xl font-bold mb-4">"博客文章"</h1>
+        {async_result}
+        // // 使用Transition处理加载状态
+        // <Transition
+        //     fallback=move || view! { 
+        //         <div class="text-center py-8">
+        //             <p>"加载中..."</p>
+        //         </div>
+        //     }
+        // >
+        //     // 处理资源的不同状态
+        //     {move || match async_data.get() {
+        //         None => view! { <div>"等待数据..."</div> }.into_view(),
+        //         Some(list) => view! {}.into_view()
+        //     }}
+        // </Transition>
     }
 }
 
