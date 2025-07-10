@@ -1,6 +1,8 @@
-use leptos::{html::Search, prelude::*};
+use leptos::prelude::*;
 
 use crate::{components::ui::Link, state::use_app};
+use leptos_icons::Icon;
+use icondata as i;
 
 #[component]
 pub fn Header() -> impl IntoView { 
@@ -49,7 +51,7 @@ fn SearchBox() -> impl IntoView {
                 ass.active.set(true);
             }
         >
-            "Search"
+            <Icon icon={i::ChSearch} />
         </button>
 
     }
