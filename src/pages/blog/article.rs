@@ -5,7 +5,6 @@ use crate::{api::blog::get_articles_list, models::blog::ArticleInfo};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {
-    let (articlelist, set_articlelist) = signal(Vec::<ArticleInfo>::new());
     let async_data = LocalResource::new(move || get_articles_list());
     let async_result = move || {
         async_data

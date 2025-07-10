@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
 pub struct SearchState {
-    pub all_articles: RwSignal<HashMap<String, Article>>, // 文章ID -> 文章
+    pub all_articles: RwSignal<HashMap<String, Article>>,
     pub search_query: RwSignal<String>,
     pub search_results: RwSignal<Vec<Article>>,
 }
@@ -30,9 +30,9 @@ impl SearchState {
         
         let results: Vec<Article> = articles.values()
             .filter(|article| {
-                article.title.to_lowercase().contains(&query) ||
-                article.content.to_lowercase().contains(&query) ||
-                article.tags.iter().any(|tag| tag.to_lowercase().contains(&query))
+                article.title().to_lowercase().contains(&query) ||
+                article.content().to_lowercase().contains(&query) ||
+                article.tags().iter().any(|tag| tag.to_lowercase().contains(&query))
             })
             .take(5) // 最多显示5条结果
             .cloned()
@@ -48,4 +48,24 @@ pub fn provide_search_context() {
 
 pub fn use_search() -> SearchState {
     use_context::<SearchState>().expect("SearchState should be provided")
+}
+
+#[derive(Clone, Debug)]
+pub struct AppState { 
+    pub active: RwSignal<bool>,
+}
+impl AppState {
+    pub fn new() -> Self { 
+        Self {
+            active: RwSignal::new(false),
+        }
+    }
+}
+
+pub fn provide_app_context() { 
+    provide_context(AppState::new());
+}
+
+pub fn use_app() -> AppState { 
+    use_context::<AppState>().expect("AppState should be provided")
 }

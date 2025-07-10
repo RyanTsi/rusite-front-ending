@@ -1,6 +1,6 @@
-use leptos::prelude::*;
+use leptos::{html::Search, prelude::*};
 
-use crate::components::ui::Link;
+use crate::{components::ui::Link, state::use_app};
 
 #[component]
 pub fn Header() -> impl IntoView { 
@@ -12,8 +12,8 @@ pub fn Header() -> impl IntoView {
                     <RouterLinks/>
                 </div>
                 <div id="navright" class="flex items-center space-x-12"> 
-                    <b>"Search"</b>
-                    <b>"User"</b>
+                    <SearchBox/>
+                    <UserBox/>
                 </div>
             </nav>
         </header>
@@ -37,5 +37,27 @@ fn RouterLinks() -> impl IntoView {
             <Link href="/blog">"Blog"</Link>
             <Link href="/about">"About"</Link>
         </div>
+    }
+}
+
+#[component]
+fn SearchBox() -> impl IntoView {
+    let ass = use_app();
+    view! {
+        <button
+            on:click=move |_| {
+                ass.active.set(true);
+            }
+        >
+            "Search"
+        </button>
+
+    }
+}
+
+#[component]
+fn UserBox() -> impl IntoView {
+    view! {
+        <b>"User"</b>
     }
 }

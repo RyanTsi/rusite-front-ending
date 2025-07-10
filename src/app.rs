@@ -1,4 +1,6 @@
-use leptos::prelude::*;
+use std::collections::HashMap;
+
+use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use leptos_router::{
     components::{
@@ -7,24 +9,26 @@ use leptos_router::{
     path
 };
 use crate::{
-    components::layout::{
+    api::blog::get_all_articles_details, components::{layout::{
         footer::Footer,
         header::Header
-    },
-    pages::{
+    }, ui::backdrop::Backdrop}, pages::{
         about::AboutPage, blog::article::{
             ArticleDital,
             ArticleList
         }, chat::ChatGroupList, home::HomePage, notfound::NotFoundPage, user::UserProfilePage
-    }
+    }, state::{provide_app_context, provide_search_context, use_app, use_search}
 };
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
+    provide_search_context();
+    provide_app_context();
+    let ass = use_app();
     view! {
         <Router>
-            <Link/>
+            <Backdrop show=ass.active/>
             <Header/>
             <main class="container mx-auto px-4 py-8">
                 <Routes fallback=NotFoundPage>

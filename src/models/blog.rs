@@ -1,16 +1,40 @@
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Article {
-    pub aid: String,
-    pub title: String,
-    pub content: String,
-    pub summary: String,
-    pub tags: Vec<String>,
-    pub categories: Vec<String>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    info: Arc<ArticleInfo>,
+    content: String,
+    comments: Arc<Vec<Comment>>
+}
+impl Article {
+    pub fn new(info: ArticleInfo, content: &str, comments: Vec<Comment>) -> Self {
+        Article {
+            info: Arc::new(info),
+            content: String::from(content),
+            comments: Arc::new(comments),
+        }
+    }
+    pub fn aid(&self) -> String {
+        self.info.aid.clone()
+    }
+    pub fn title(&self) -> &str {
+        &self.info.title
+    }
+    pub fn tags(&self) -> &[String] {
+        &self.info.tags
+    }
+    pub fn categories(&self) -> &[String] {
+        &self.info.categories
+    }
+    pub fn content(&self) -> &str {
+        &self.content
+    }
+    pub fn comments(&self) -> &[Comment] {
+        &self.comments
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -25,7 +49,7 @@ pub struct ArticleInfo {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ArticleCreateRequest {
     pub title: String,
     pub tags: Vec<String>,
@@ -49,10 +73,10 @@ pub struct ArticleModifyRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Comment {
     pub cid: String,
-    pub aid: String,
     pub uid: String,
     pub content: String,
     pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,7 +1,7 @@
 pub mod icon;
 pub mod form;
 pub mod button;
-pub mod overlay;
+pub mod backdrop;
 
 use leptos::prelude::*;
 
