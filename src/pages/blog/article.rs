@@ -1,35 +1,28 @@
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::{api::blog::get_articles_list, models::blog::ArticleInfo};
+use crate::{api::blog::get_articles_list, components::ui::card::ArticleInfoCard, models::blog::ArticleInfo};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {
     let async_data = LocalResource::new(move || get_articles_list());
-    let async_result = move || {
-        async_data
-            .get()
-            .map(|value| format!("Server returned {value:?}"))
-            // This loading state will only show before the first load
-            .unwrap_or_else(|| "Loading...".into())
-    };
+    let article_list = move || async_data.get();
     view! {
         <h1 class="text-2xl font-bold mb-4">"博客文章"</h1>
-        {async_result}
-        // // 使用Transition处理加载状态
-        // <Transition
-        //     fallback=move || view! { 
-        //         <div class="text-center py-8">
-        //             <p>"加载中..."</p>
-        //         </div>
-        //     }
-        // >
-        //     // 处理资源的不同状态
-        //     {move || match async_data.get() {
-        //         None => view! { <div>"等待数据..."</div> }.into_view(),
-        //         Some(list) => view! {}.into_view()
-        //     }}
-        // </Transition>
+        <Show when=move || 
+            article_list().is_some()
+            fallback=|| view! { <div>Loading...</div> }
+        > 
+            <For
+                each=move || article_list().unwrap()
+                key=|article| article.aid.clone()
+                children=move |article| {
+                    view! {
+                        <ArticleInfoCard info=article />
+                    }
+                }
+            />
+        </Show>
     }
 }
 

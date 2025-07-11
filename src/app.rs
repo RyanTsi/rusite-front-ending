@@ -40,7 +40,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <div>
                 <Backdrop show=ass.active />
-                <SearchPanle show=ass.active/>
+                <SearchPanle show=ass.active />
             </div>
             <Header />
             <main class="container mx-auto px-4 py-8">
