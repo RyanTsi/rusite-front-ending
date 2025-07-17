@@ -19,6 +19,9 @@ fn Card(
     /// 圆角大小
     #[prop(optional, default = CardRadius::Md)]
     radius: CardRadius,
+    /// 
+    #[prop(optional, into)]
+    class: String,
     /// 主体内容
     children: Children,
     // /// 头部插槽
@@ -41,13 +44,14 @@ fn Card(
     let color = "bg_white";
     // 组合所有类名
     let card_classes = format!(
-        "{} {} {} {} hover:{} transition-shadow duration-300 {} w-2/3",
+        "{} {} {} {} hover:{} transition-shadow duration-300 {} w-2/3 {}",
         padding_class,
         color,
         radius_class,
         elevation_class,
         h_elevation_class,
         variant_class,
+        class,
     );
 
     view! {
@@ -161,7 +165,49 @@ pub fn ArticleInfoCard(
 ) -> impl IntoView { 
     view! {
         <Card>
-            <p>{info.aid}</p>
+            <div class="flex flex-row justify-between">
+                <h1 class = "text-3xl font-bold">
+                    {info.title}
+                </h1>
+                <p class = "text-gray-400 text-sm">
+                    {info.updated_at.to_string()}
+                </p>
+            </div>
+            <div class="my-4">
+                <p class="text-gray-600">
+                    {info.summary}
+                </p>
+            </div>
+            <div class="flex flex-row gap=4 justify-between items-center">
+                <div class="flex flex-row gap-2 items-center">
+                    <div id="categories" class="flex flex-wrap gap-2">
+                        <For
+                            each=move || info.categories.clone()
+                            key=|tag| tag.clone()
+                            children=move |tag| {
+                                view! {
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                                    {tag}
+                                    </span>
+                                }
+                            }
+                        />
+                    </div>
+                    <div id="tags" class="flex flex-wrap gap-2">
+                        <For
+                            each=move || info.tags.clone()
+                            key=|tag| tag.clone()
+                            children=move |tag| {
+                                view! {
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                                    {tag}
+                                    </span>
+                                }
+                            }
+                        />
+                    </div>
+                </div>
+            </div>
         </Card>
     }
 }
