@@ -1,7 +1,7 @@
 use leptos::{children, html::Div, prelude::*};
 use leptos_icons::Icon;
 use icondata as i;
-use crate::{components::ui::{icon::DividingLine, Link}, models::blog::{Article, ArticleInfo}, utils::format_date_cn};
+use crate::{components::ui::{icon::DividingLine, button::Link}, models::blog::{Article, ArticleInfo}, utils::format_date_cn};
 
 #[component]
 fn Card(

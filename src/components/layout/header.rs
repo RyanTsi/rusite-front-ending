@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::{components::ui::Link, state::use_app};
+use crate::{components::ui::button::Link, state::use_app};
 use leptos_icons::Icon;
 use icondata as i;
 
