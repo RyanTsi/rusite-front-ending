@@ -43,16 +43,18 @@ pub fn App() -> impl IntoView {
                 <SearchPanle show=ass.active />
             </div>
             <Header />
-            <main class="container mx-auto px-4 py-8">
-                <Routes fallback=NotFoundPage>
-                    <Route path=path!("/") view=HomePage />
-                    <Route path=path!("/blog") view=ArticleList />
-                    <Route path=path!("/blog/:id") view=ArticleDital />
-                    <Route path=path!("/about") view=AboutPage />
-                    <Route path=path!("/chat") view=ChatGroupList />
-                    <Route path=path!("/user") view=UserProfilePage />
-                </Routes>
-            </main>
+            <div class="flex flex-col bg-gray-100 min-h-screen w-full h-full -z-50 dark:bg-blue-800">
+                <main class="px-4 py-8">
+                    <Routes fallback=NotFoundPage>
+                        <Route path=path!("/") view=HomePage />
+                        <Route path=path!("/blog") view=ArticleList />
+                        <Route path=path!("/blog/:id") view=ArticleDital />
+                        <Route path=path!("/about") view=AboutPage />
+                        <Route path=path!("/chat") view=ChatGroupList />
+                        <Route path=path!("/user") view=UserProfilePage />
+                    </Routes>
+                </main>
+            </div>
             <Footer />
         </Router>
     }

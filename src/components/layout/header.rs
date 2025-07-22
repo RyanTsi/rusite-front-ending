@@ -7,8 +7,8 @@ use icondata as i;
 #[component]
 pub fn Header() -> impl IntoView { 
     view! {
-        <header>
-            <nav class="sticky top-0 flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm shadow-sm z-30">
+        <header class="sticky top-0">
+            <nav class="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm shadow-sm z-30">
                 <div id="navleft" class="flex items-center space-x-12">
                     <Favicon/>
                     <RouterLinks/>
@@ -35,9 +35,9 @@ fn Favicon() -> impl IntoView {
 fn RouterLinks() -> impl IntoView { 
     view! {
         <div id="links" class="space-x-8">
-            <Link href="/">"Home"</Link>
-            <Link href="/blog">"Blog"</Link>
-            <Link href="/about">"About"</Link>
+            <Link href="/".to_string()>"Home"</Link>
+            <Link href="/blog".to_string()>"Blog"</Link>
+            <Link href="/about".to_string()>"About"</Link>
         </div>
     }
 }

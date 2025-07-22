@@ -8,7 +8,7 @@ use leptos::prelude::*;
 
 #[component]
 pub fn Link(
-    href: &'static str,
+    href: String,
     children: Children,
     #[prop(optional, into)]
     class: String

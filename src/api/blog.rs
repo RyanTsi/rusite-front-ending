@@ -11,7 +11,7 @@ pub async fn get_article_content(aid: &str) -> String {
 }
 
 pub async fn get_article_comments(aid: &str) -> Vec<Comment> {
-    fetch_api(format!("/article/{aid}/comments").as_str(), Method::GET, None).await.unwrap_or_default()
+    fetch_api(format!("/article/{aid}/comment").as_str(), Method::GET, None).await.unwrap_or_default()
 }
 
 pub async fn get_article_details(info: ArticleInfo) -> Article {
@@ -29,6 +29,12 @@ pub async fn get_all_articles_details() -> Vec<Article> {
         articles.push(article);
     }
     articles
+}
+
+pub async fn get_article(aid: String) -> Article { 
+    let info = get_articles_list().await.into_iter().find(|info| info.aid == aid).unwrap();
+    let article = get_article_details(info).await;
+    article
 }
 
 // TODO: 

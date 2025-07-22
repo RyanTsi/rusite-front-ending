@@ -34,7 +34,7 @@ impl SearchState {
                 article.content().to_lowercase().contains(&query) ||
                 article.tags().iter().any(|tag| tag.to_lowercase().contains(&query))
             })
-            .take(5) // 最多显示5条结果
+            .take(10) // 最多显示10条结果
             .cloned()
             .collect();
         

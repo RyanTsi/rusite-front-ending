@@ -1,6 +1,7 @@
-use leptos::{children, prelude::*};
-
-use crate::models::blog::ArticleInfo;
+use leptos::{children, html::Div, prelude::*};
+use leptos_icons::Icon;
+use icondata as i;
+use crate::{components::ui::{icon::DividingLine, Link}, models::blog::{Article, ArticleInfo}, utils::format_date_cn};
 
 #[component]
 fn Card(
@@ -41,18 +42,18 @@ fn Card(
     // 内边距类名
     let padding_class = padding.as_class();
 
-    let color = "bg_white";
+    let color = "bg-white";
     // 组合所有类名
     let card_classes = format!(
-        "{} {} {} {} hover:{} transition-shadow duration-300 {} w-2/3 {}",
+        "{} {} {} {} hover:{} transition-all duration-300 {}",
         padding_class,
         color,
         radius_class,
         elevation_class,
         h_elevation_class,
-        variant_class,
         class,
     );
+    // let card_classes = "p-8 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 w-2/3";
 
     view! {
         <div class=card_classes>
@@ -162,7 +163,8 @@ impl CardRadius {
 #[component]
 pub fn ArticleInfoCard(
     info: ArticleInfo,
-) -> impl IntoView { 
+) -> impl IntoView {
+    let url = format!("/blog/{}", info.aid);
     view! {
         <Card>
             <div class="flex flex-row justify-between">
@@ -170,7 +172,7 @@ pub fn ArticleInfoCard(
                     {info.title}
                 </h1>
                 <p class = "text-gray-400 text-sm">
-                    {info.updated_at.to_string()}
+                    {format_date_cn(info.created_at)}
                 </p>
             </div>
             <div class="my-4">
@@ -180,6 +182,7 @@ pub fn ArticleInfoCard(
             </div>
             <div class="flex flex-row gap=4 justify-between items-center">
                 <div class="flex flex-row gap-2 items-center">
+                    <Icon icon={i::FaFolderOpenSolid}/>
                     <div id="categories" class="flex flex-wrap gap-2">
                         <For
                             each=move || info.categories.clone()
@@ -187,12 +190,13 @@ pub fn ArticleInfoCard(
                             children=move |tag| {
                                 view! {
                                     <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                                    {tag}
+                                        {tag}
                                     </span>
                                 }
                             }
                         />
                     </div>
+                    <Icon icon={i::FaTagsSolid}/>
                     <div id="tags" class="flex flex-wrap gap-2">
                         <For
                             each=move || info.tags.clone()
@@ -200,14 +204,58 @@ pub fn ArticleInfoCard(
                             children=move |tag| {
                                 view! {
                                     <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                                    {tag}
+                                        {tag}
                                     </span>
                                 }
                             }
                         />
                     </div>
                 </div>
+                <div>
+                    <Link href=url>
+                        <div class="flex flex-row items-center justify-center gap-1">
+                            <p> "Read" </p>
+                            <Icon icon={i::FaChevronRightSolid}/>
+                        </div>
+                    </Link>
+                </div>
             </div>
+        </Card>
+    }
+}
+
+#[component]
+pub fn ArticleCard(
+    article: Article
+) -> impl IntoView {
+    view! {
+        <Card class="flex mx-auto w-2/3 h-screen">
+            <div class="flex flex-col gap-4 w-full">
+                <div id="header" class="flex flex-col gap-4">
+                    <div class="flex flex-row items-center text-2xl gap-8">
+                        // <Link href="/blog".to_string()>
+                        //     <Icon icon={i::FaChevronLeftSolid}/>
+                        // </Link>
+                        <h1> {article.title().to_string()} </h1>
+                    </div>
+                    <div class="flex flex-row items-center gap-8">
+                        <p> {article.created_at().to_string()} </p>
+                        <p> {article.updated_at().to_string()} </p>
+                        <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
+                            <Icon icon={i::FaFolderOpenSolid}/>
+                            <p> {article.tags().join(" | ")} </p>
+                        </div>
+                        <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
+                            <Icon icon={i::FaTagsSolid}/>
+                            <p> {article.categories().join(" | ")} </p>
+                        </div>
+                    </div>
+                </div>
+                <DividingLine/>
+
+                <p> {article.content().to_string()} </p>
+            </div>
+
         </Card>
     }
 }

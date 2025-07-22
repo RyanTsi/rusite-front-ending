@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use crate::utils::*;
 
 #[derive(Debug, Clone)]
 pub struct Article {
@@ -34,6 +35,12 @@ impl Article {
     }
     pub fn comments(&self) -> &[Comment] {
         &self.comments
+    }
+    pub fn created_at(&self) -> String {
+        format_date_cn(self.info.created_at)
+    }
+    pub fn updated_at(&self) -> String {
+        format_date_cn(self.info.updated_at)
     }
 }
 
