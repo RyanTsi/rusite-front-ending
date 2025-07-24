@@ -53,11 +53,13 @@ pub fn use_search() -> SearchState {
 #[derive(Clone, Debug)]
 pub struct AppState { 
     pub active: RwSignal<bool>,
+    pub current_page: RwSignal<usize>,
 }
 impl AppState {
     pub fn new() -> Self { 
         Self {
             active: RwSignal::new(false),
+            current_page: RwSignal::new(1),
         }
     }
 }

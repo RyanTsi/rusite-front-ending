@@ -15,10 +15,10 @@ use crate::{
     }, ui::panle::SearchPanle},
     pages::{
         about::AboutPage,
-        blog::article::{
+        blog::{article::{
             ArticleDital,
             ArticleList
-        }, 
+        }, index::BlogIndex}, 
         chat::ChatGroupList, home::HomePage, notfound::NotFoundPage, user::UserProfilePage
     },
     state::{
@@ -47,7 +47,7 @@ pub fn App() -> impl IntoView {
                 <main class="px-4 py-8">
                     <Routes fallback=NotFoundPage>
                         <Route path=path!("/") view=HomePage />
-                        <Route path=path!("/blog") view=ArticleList />
+                        <Route path=path!("/blog") view=BlogIndex />
                         <Route path=path!("/blog/:id") view=ArticleDital />
                         <Route path=path!("/about") view=AboutPage />
                         <Route path=path!("/chat") view=ChatGroupList />

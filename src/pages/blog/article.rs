@@ -1,12 +1,14 @@
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::{api::blog::{get_article, get_articles_list}, components::ui::card::{ArticleCard, ArticleInfoCard}, models::blog::ArticleInfo};
+use crate::{api::blog::{get_article, get_articles_list}, components::ui::card::{ArticleCard, ArticleInfoCard}, models::blog::ArticleInfo, state::use_app};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {
+    let state = use_app();
     let async_data = LocalResource::new(move || get_articles_list());
     let article_list = move || async_data.get();
+    // let view_list = RwSignal::new();
     view! {
         <Show when=move || 
             article_list().is_some()
@@ -26,6 +28,14 @@ pub fn ArticleList() -> impl IntoView {
                 </div>
             </div>
         </Show>
+    }
+}
+
+#[component]
+fn PageLeader() -> impl IntoView{
+
+    view! {
+
     }
 }
 
