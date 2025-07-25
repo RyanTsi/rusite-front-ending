@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::{ev, prelude::*};
 
 #[component]
 pub fn Link(
@@ -22,14 +22,23 @@ pub fn Link(
 
 #[component]
 pub fn Button(
+    children: Children,
+    #[prop(optional, into)]
+    class: Signal<String>,
+    #[prop(optional, into)]
+    on_click: Option<Callback<ev::MouseEvent>>,
+) -> impl IntoView {
+    let on_click_handler = move |e: ev::MouseEvent| {
+        if let Some(callback) = on_click {
+            callback.run(e);
+        }
+    };
 
-) -> impl IntoView { 
     view! {
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
-            on:click=move |_| {
-            }
+        <button class=class
+            on:click=on_click_handler
         >
-            "Click me"
+            {children()}
         </button>
     }
 }

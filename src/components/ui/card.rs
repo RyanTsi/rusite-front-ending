@@ -1,4 +1,4 @@
-use leptos::{children, html::Div, prelude::*};
+use leptos::prelude::*;
 use leptos_icons::Icon;
 use icondata as i;
 use crate::{components::ui::{icon::DividingLine, button::Link}, models::blog::{Article, ArticleInfo}, utils::format_date_cn};
@@ -255,7 +255,16 @@ pub fn ArticleCard(
 
                 <p> {article.content().to_string()} </p>
             </div>
+        </Card>
+    }
+}
 
+#[component]
+pub fn FilterBar() -> impl IntoView {
+    view! {
+        <Card>
+            
+            <DividingLine/>
         </Card>
     }
 }

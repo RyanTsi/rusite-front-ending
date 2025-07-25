@@ -215,6 +215,9 @@
   .top-1\/6 {
     top: calc(1/6 * 100%);
   }
+  .top-24 {
+    top: calc(var(--spacing) * 24);
+  }
   .-z-50 {
     z-index: calc(50 * -1);
   }
@@ -262,6 +265,9 @@
   }
   .min-h-screen {
     min-height: 100vh;
+  }
+  .w-1\/3 {
+    width: calc(1/3 * 100%);
   }
   .w-2\/3 {
     width: calc(2/3 * 100%);
@@ -321,6 +327,9 @@
       margin-inline-start: calc(calc(var(--spacing) * 12) * var(--tw-space-x-reverse));
       margin-inline-end: calc(calc(var(--spacing) * 12) * calc(1 - var(--tw-space-x-reverse)));
     }
+  }
+  .self-start {
+    align-self: flex-start;
   }
   .rounded {
     border-radius: 0.25rem;
