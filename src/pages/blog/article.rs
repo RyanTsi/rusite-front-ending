@@ -10,7 +10,7 @@ pub fn ArticleList() -> impl IntoView {
     let state = use_app();
     let async_data = LocalResource::new(move || get_articles_list());
     let article_list = move || async_data.get();
-    let current_page = move || state.current_page.get();
+    let current_page = Memo::new(move |_| state.current_page.get());
     let items_per_page = move || state.items_per_page.get();
     let total_pages = Memo::new(move |_| {
         let articles = article_list().unwrap();
@@ -21,12 +21,12 @@ pub fn ArticleList() -> impl IntoView {
             article_list().is_some()
             fallback=|| view! { <div>Loading...</div> }
         > 
-            <div class="flex flex-col mx-[10%]">
-                <div class="flex flex-col gap-8 w-2/3">
+            <div class="flex flex-col mx-[10%] gap-8">
+                <div class="flex flex-col gap-8 w-2/3 h-screen">
                     <For
                         each=move || {
                             let all = article_list().unwrap();
-                            let start = (current_page() - 1) * items_per_page();
+                            let start = (current_page.get() - 1) * items_per_page();
                             let current = all.into_iter().skip(start).take(items_per_page()).collect::<Vec<_>>();
                             current
                         }
@@ -46,10 +46,18 @@ pub fn ArticleList() -> impl IntoView {
 
 #[component]
 fn PageLeader(
-    total_pages: Memo<usize>
+    total_pages: Memo<usize>,
 ) -> impl IntoView{
     let state = use_app();
-    let current_page = move || state.current_page.get();
+
+    let page_range = Memo::new(move |_| {
+        let curr_page = state.current_page.get();
+        let total = total_pages.get();
+        let start = if curr_page > 2 { curr_page - 2 } else { 1 };
+        let end = if curr_page + 2 <= total { curr_page + 2 } else { total };
+        (start..=end).collect::<Vec<_>>()
+    });
+    
     view! {
         <div>
             <Show when=move || (total_pages.get() > 1)>
@@ -60,19 +68,21 @@ fn PageLeader(
                         <p>"Back"</p>
                     </button>
                     <For 
-                        each=move || {
-                            let start = if current_page() > 2 { current_page() - 2 } else { 1 };
-                            let end = if current_page() + 2 <= total_pages.get() { current_page() + 2 } else { total_pages.get() };
-                            start..=end
-                        }
-                        key=|page| { page.clone() }
+                        each=move || {page_range.get()}
+                        key=|page| { *page }
                         children=move |page| {
-                            let is_current = page == current_page();
-                            let bg_color = if is_current { "bg-blue-200" } else { "bg-white" };
+                            let is_current = Memo::new({
+                                let page = page;
+                                move |_| page == state.current_page.get()
+                            });
                             
+                            let button_class = move || {
+                                let bg_color = if is_current.get() { "bg-blue-200" } else { "bg-white" };
+                                format!("px-4 py-2 mx-1 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300 {}", bg_color)
+                            };
                             view! {
                                 <button 
-                                    class={"px-4 py-2 mx-1 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300 ".to_string() + bg_color}
+                                    class=button_class
                                     on:click=move |_| {
                                         state.current_page.set(page);
                                     }>
