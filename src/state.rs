@@ -1,4 +1,4 @@
-use crate::models::blog::Article;
+use crate::{api::blog::{get_all_articles_details, get_categories, get_tags}, models::blog::{Article, Category, Tag}};
 use leptos::prelude::*;
 use std::collections::HashMap;
 
@@ -55,6 +55,9 @@ pub struct AppState {
     pub active: RwSignal<bool>,
     pub current_page: RwSignal<usize>,
     pub items_per_page: RwSignal<usize>,
+    pub articles: RwSignal<Vec<Article>>,
+    pub tags: RwSignal<Vec<Tag>>,
+    pub categories: RwSignal<Vec<Category>>,
 }
 impl AppState {
     pub fn new() -> Self { 
@@ -62,7 +65,18 @@ impl AppState {
             active: RwSignal::new(false),
             current_page: RwSignal::new(1),
             items_per_page: RwSignal::new(1),
+            articles: RwSignal::new(vec![]),
+            tags: RwSignal::new(vec![]),
+            categories: RwSignal::new(vec![]),
         }
+    }
+    pub async fn load_data(&self) { 
+        let articles = get_all_articles_details().await;
+        let tags = get_tags().await;
+        let categories = get_categories().await;
+        self.articles.set(articles);
+        self.tags.set(tags);
+        self.categories.set(categories);
     }
 }
 

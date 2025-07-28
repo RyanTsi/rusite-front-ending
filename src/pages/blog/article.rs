@@ -10,11 +10,11 @@ pub fn ArticleList() -> impl IntoView {
     let state = use_app();
     let async_data = LocalResource::new(move || get_articles_list());
     let article_list = move || async_data.get();
-    let current_page = Memo::new(move |_| state.current_page.get());
-    let items_per_page = move || state.items_per_page.get();
+    let current_page = state.current_page;
+    let items_per_page = state.items_per_page;
     let total_pages = Memo::new(move |_| {
         let articles = article_list().unwrap();
-        articles.len() / items_per_page() + (articles.len() % items_per_page() > 0) as usize + (articles.len() == 0) as usize
+        articles.len() / items_per_page.get() + (articles.len() % items_per_page.get() > 0) as usize + (articles.len() == 0) as usize
     });
     Effect::new(move |_| {
         // 当 current_page 变化时执行
@@ -35,8 +35,8 @@ pub fn ArticleList() -> impl IntoView {
                         <For
                             each=move || {
                                 let all = article_list().unwrap();
-                                let start = (current_page.get() - 1) * items_per_page();
-                                let current = all.into_iter().skip(start).take(items_per_page()).collect::<Vec<_>>();
+                                let start = (current_page.get() - 1) * items_per_page.get();
+                                let current = all.into_iter().skip(start).take(items_per_page.get()).collect::<Vec<_>>();
                                 current
                             }
                             key=|article| article.aid.clone()
@@ -75,11 +75,14 @@ fn PageLeader(
         <div>
             <Show when=move || (total_pages.get() > 1)>
                 <div class="flex justify-center gap-4">
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded" on:click=move |_| {
-                        state.current_page.update(|page| *page = max(*page - 1, 1));
-                    }>
-                        <p>"Back"</p>
-                    </button>
+                    <Button
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded"
+                        on_click=Callback::new(move |_| {
+                            state.current_page.update(|page| *page = max(*page - 1, 1));
+                        })
+                    >
+                        <p> "Back" </p>
+                    </Button>
                     <For 
                         each=move || {page_range.get()}
                         key=|page| { *page }
@@ -94,13 +97,6 @@ fn PageLeader(
                                 format!("px-4 py-2 mx-1 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300 {}", bg_color)
                             });
                             view! {
-                                // <button 
-                                //     class=button_class
-                                //     on:click=move |_| {
-                                //         state.current_page.set(page);
-                                //     }>
-                                //     {page}
-                                // </button>
                                 <Button 
                                     class=button_class
                                     on_click=Callback::new(move |_| {state.current_page.set(page);})
@@ -111,11 +107,14 @@ fn PageLeader(
                             
                         }
                     />
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded" on:click=move |_| {
+                    <Button
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded"
+                        on_click=Callback::new(move |_| {
                             state.current_page.update(|page| *page = min(*page + 1, total_pages.get()));
-                    }>
-                        <p>"Next"</p>
-                    </button>
+                        })
+                    >
+                        <p> "Back" </p>
+                    </Button>
                 </div>
             </Show>
         </div>

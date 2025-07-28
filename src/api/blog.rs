@@ -1,5 +1,5 @@
 
-use crate::{api::client::fetch_api, models::blog::{Article, ArticleInfo, Comment}};
+use crate::{api::client::fetch_api, models::blog::{Article, ArticleInfo, Category, Comment, Tag}};
 use reqwest::Method;
 
 pub async fn get_articles_list() -> Vec<ArticleInfo> {
@@ -35,6 +35,14 @@ pub async fn get_article(aid: String) -> Article {
     let info = get_articles_list().await.into_iter().find(|info| info.aid == aid).unwrap();
     let article = get_article_details(info).await;
     article
+}
+
+pub async fn get_tags() -> Vec<Tag> {
+    fetch_api("/article/tags", Method::GET, None).await.unwrap_or_default()
+}
+
+pub async fn get_categories() -> Vec<Category> {
+    fetch_api("/article/categories", Method::GET, None).await.unwrap_or_default()
 }
 
 // TODO: 

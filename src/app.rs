@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::sync::Arc;
 
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
@@ -34,7 +34,12 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
     provide_search_context();
     provide_app_context();
+
     let ass = use_app();
+    let ass_clone = ass.clone();
+    spawn_local(async move {
+        ass_clone.load_data().await;
+    });
     
     view! {
         <Router>

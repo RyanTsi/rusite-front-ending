@@ -98,3 +98,15 @@ pub struct CommentModifyRequest {
     pub cid: String,
     pub content: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Tag {
+    pub name: String,
+    pub count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Category {
+    pub name: String,
+    pub count: i32,
+}
