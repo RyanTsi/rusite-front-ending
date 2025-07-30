@@ -42,6 +42,9 @@ impl Article {
     pub fn updated_at(&self) -> String {
         format_date_cn(self.info.updated_at)
     }
+    pub fn info(&self) -> &ArticleInfo {
+        &self.info
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

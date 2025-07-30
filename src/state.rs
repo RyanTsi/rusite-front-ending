@@ -1,6 +1,6 @@
 use crate::{api::blog::{get_all_articles_details, get_categories, get_tags}, models::blog::{Article, Category, Tag}};
 use leptos::prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug)]
 pub struct SearchState {
@@ -51,32 +51,117 @@ pub fn use_search() -> SearchState {
 }
 
 #[derive(Clone, Debug)]
+pub struct FilterBarState {
+    pub tags: RwSignal<Vec<Tag>>,
+    pub categories: RwSignal<Vec<Category>>,
+    pub selected_tags: RwSignal<HashSet<String>>,
+    pub selected_categories: RwSignal<HashSet<String>>,
+}
+
+impl FilterBarState {
+    pub fn new() -> Self { 
+        Self {
+            tags: RwSignal::new(vec![]),
+            categories: RwSignal::new(vec![]),
+            selected_tags: RwSignal::new(HashSet::new()),
+            selected_categories: RwSignal::new(HashSet::new()),
+        }
+    }
+    pub fn add_tag(&self, tag: String) {
+        self.selected_tags.update(|tags| {
+            tags.insert(tag);
+        });
+    }
+
+    pub fn add_category(&self, category: String) { 
+        self.selected_categories.update(|categories| {
+            categories.insert(category);
+        });
+    }
+    pub fn remove_tag(&self, tag: String) {
+        self.selected_tags.update(|tags| {
+            tags.remove(&tag);
+        });
+    }
+    pub fn remove_category(&self, category: String) { 
+        self.selected_categories.update(|categories| {
+            categories.remove(&category);
+        });
+    }
+    pub fn switch_tag_selected(&self, tag: String) {
+        if (self.is_selected_tag(&tag)).get() {
+            self.remove_tag(tag);
+        } else {
+            self.add_tag(tag);
+        }
+    }
+    pub fn switch_category_selected(&self, category: String) { 
+        if (self.is_selected_category(&category)).get() {
+            self.remove_category(category);
+        } else {
+            self.add_category(category);
+        }
+    }
+    pub fn is_selected_tag(&self, tag: &str) -> RwSignal<bool> { 
+        let is_selectes = self.selected_tags.get().contains(tag);
+        RwSignal::new(is_selectes)
+    }
+    pub fn is_selected_category(&self, category: &str) -> RwSignal<bool> { 
+        let is_selectes = self.selected_categories.get().contains(category);
+        RwSignal::new(is_selectes)
+    }
+    pub fn clear_filters(&self) { 
+        self.selected_tags.update(|tags| {
+            tags.clear();
+        });
+        self.selected_categories.update(|categories| {
+            categories.clear();
+        });
+    }
+
+}
+
+#[derive(Clone, Debug)]
 pub struct AppState { 
     pub active: RwSignal<bool>,
     pub current_page: RwSignal<usize>,
     pub items_per_page: RwSignal<usize>,
     pub articles: RwSignal<Vec<Article>>,
-    pub tags: RwSignal<Vec<Tag>>,
-    pub categories: RwSignal<Vec<Category>>,
+    pub aid_map: RwSignal<HashMap<String, usize>>,
+    pub filter_bar_state: RwSignal<FilterBarState>,
 }
+
 impl AppState {
     pub fn new() -> Self { 
         Self {
             active: RwSignal::new(false),
             current_page: RwSignal::new(1),
-            items_per_page: RwSignal::new(1),
+            items_per_page: RwSignal::new(2),
             articles: RwSignal::new(vec![]),
-            tags: RwSignal::new(vec![]),
-            categories: RwSignal::new(vec![]),
+            aid_map: RwSignal::new(HashMap::new()),
+            filter_bar_state: RwSignal::new(FilterBarState::new()),
         }
     }
     pub async fn load_data(&self) { 
         let articles = get_all_articles_details().await;
+        for idx in 0..articles.len() {
+            self.aid_map.update(|map| {
+                map.insert(articles[idx].aid().clone(), idx);
+            });
+        }
         let tags = get_tags().await;
         let categories = get_categories().await;
         self.articles.set(articles);
-        self.tags.set(tags);
-        self.categories.set(categories);
+        self.filter_bar_state.get().tags.set(tags);
+        self.filter_bar_state.get().categories.set(categories);
+    }
+    pub fn get_article(&self, aid: String) -> RwSignal<Option<Article>> { 
+        let article = self.aid_map.with_untracked(|map| {
+            map.get(&aid).and_then(|idx| {
+                Some((self.articles.get_untracked())[*idx].clone())
+            })
+        });
+        RwSignal::new(article)
     }
 }
 

@@ -3,17 +3,16 @@ use std::cmp::{max, min};
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::{api::blog::{get_article, get_articles_list}, components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBar}}, state::use_app};
+use crate::{api::blog::{get_article, get_articles_list}, components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBarCard}}, pages::{blog::article, notfound::NotFoundPage}, state::use_app};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {
     let state = use_app();
-    let async_data = LocalResource::new(move || get_articles_list());
-    let article_list = move || async_data.get();
+    let article_list = state.articles;
     let current_page = state.current_page;
     let items_per_page = state.items_per_page;
     let total_pages = Memo::new(move |_| {
-        let articles = article_list().unwrap();
+        let articles = article_list.get();
         articles.len() / items_per_page.get() + (articles.len() % items_per_page.get() > 0) as usize + (articles.len() == 0) as usize
     });
     Effect::new(move |_| {
@@ -25,35 +24,30 @@ pub fn ArticleList() -> impl IntoView {
             .scroll_to_with_x_and_y(0.0, 0.0);
     });
     view! {
-        <Show when=move || 
-            article_list().is_some()
-            fallback=|| view! { <div>Loading...</div> }
-        > 
-            <div class="flex flex-col mx-[10%] gap-8">
-                <div class="flex flex-row gap-8 w-full">
-                    <div class="flex flex-col gap-8 w-2/3">
-                        <For
-                            each=move || {
-                                let all = article_list().unwrap();
-                                let start = (current_page.get() - 1) * items_per_page.get();
-                                let current = all.into_iter().skip(start).take(items_per_page.get()).collect::<Vec<_>>();
-                                current
+        <div class="flex flex-col mx-[10%] gap-8">
+            <div class="flex flex-row gap-8 w-full">
+                <div class="flex flex-col gap-8 w-2/3">
+                    <For
+                        each=move || {
+                            let all = article_list.get();
+                            let start = (current_page.get() - 1) * items_per_page.get();
+                            let current = all.into_iter().skip(start).take(items_per_page.get()).collect::<Vec<_>>();
+                            current
+                        }
+                        key=|article| article.aid().clone()
+                        children=move |article| {
+                            view! {
+                                <ArticleInfoCard info=article.info().clone() />
                             }
-                            key=|article| article.aid.clone()
-                            children=move |article| {
-                                view! {
-                                    <ArticleInfoCard info=article />
-                                }
-                            }
-                        />
-                    </div>
-                    <div class="sticky top-24 self-start w-1/3">
-                        <FilterBar/>
-                    </div>
+                        }
+                    />
                 </div>
-                <PageLeader total_pages=total_pages/>
+                <div class="sticky top-24 self-start w-1/3">
+                    <FilterBar/>
+                </div>
             </div>
-        </Show>
+            <PageLeader total_pages=total_pages/>
+        </div>
     }
 }
 
@@ -125,13 +119,23 @@ fn PageLeader(
 pub fn ArticleDital() -> impl IntoView { 
     let params = use_params_map();
     let id = move || params.read().get("id").unwrap_or_default();
-    let async_data = LocalResource::new(move || get_article(id()));
-    let article = move || async_data.get();
+    let state = use_app();
+    let article = state.get_article(id());
     view! {
-        <Show when=move || article().is_some()
-            fallback=move || view! { <div>Loading...</div> }
+        <Show when=move || article.get().is_some()
+            fallback=move || view! { <NotFoundPage/> }
         >
-            <ArticleCard article=article().unwrap()/>
+            <ArticleCard article=article.get().unwrap()/>
         </Show>
+    }
+}
+
+#[component]
+pub fn FilterBar() -> impl IntoView {
+    let state = use_app();
+    view! {
+        <FilterBarCard
+            state=state.filter_bar_state
+        />
     }
 }
