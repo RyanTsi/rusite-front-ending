@@ -271,18 +271,15 @@ pub fn ArticleCard(
 pub fn FilterBarCard(
     state: RwSignal<FilterBarState>
 ) -> impl IntoView {
-    let x = move || state.get().selected_tags.get().into_iter().collect::<Vec<_>>();
-    let y = move || state.get().selected_categories.get().into_iter().collect::<Vec<_>>();
     view! {
         <Card>
             <p>Select:</p>
             // 显示已选择的tags
             <Show when=move || !state.get().selected_tags.get().is_empty()>
                 <div class="mb-4">
-                    <p class="font-medium"> "Selected Tags:" </p>
                     <div class="flex flex-wrap gap-2 mt-2">
                         <For 
-                            each=move || x()
+                            each={ move || state.get().selected_tags.get().into_iter().collect::<Vec<_>>() }
                             key=move |tag: &String| tag.clone()
                             children=move |tag| {
                                 let tag_name = tag.clone();
@@ -303,10 +300,9 @@ pub fn FilterBarCard(
             </Show>
             <Show when=move || !state.get().selected_categories.get().is_empty()>
                 <div class="mb-4">
-                    <p class="font-medium"> "Selected Categories:" </p>
                     <div class="flex flex-wrap gap-2 mt-2">
                         <For 
-                            each=move || y()
+                            each={ move || state.get().selected_categories.get().into_iter().collect::<Vec<_>>() }
                             key=move |category: &String| category.clone()
                             children=move |category| {
                                 let category_name = category.clone();
@@ -327,7 +323,7 @@ pub fn FilterBarCard(
             </Show>
             <DividingLine/>
             
-            <div class="flex flex-row gap-8">
+            <div class="flex flex-wrap gap-4">
                 <For
                     each=move || state.get().tags.get()
                     key=move |tag| tag.name.clone()
@@ -347,7 +343,7 @@ pub fn FilterBarCard(
                 />
             </div>
             <DividingLine/>
-            <div class="flex flex-row gap-8">
+            <div class="flex flex-wrap gap-4">
                 <For
                     each=move || state.get().categories.get()
                     key=move |category| category.name.clone()

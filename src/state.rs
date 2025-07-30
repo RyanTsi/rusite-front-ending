@@ -136,7 +136,7 @@ impl AppState {
         Self {
             active: RwSignal::new(false),
             current_page: RwSignal::new(1),
-            items_per_page: RwSignal::new(2),
+            items_per_page: RwSignal::new(10),
             articles: RwSignal::new(vec![]),
             aid_map: RwSignal::new(HashMap::new()),
             filter_bar_state: RwSignal::new(FilterBarState::new()),

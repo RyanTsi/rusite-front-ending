@@ -42,7 +42,7 @@ pub fn ArticleList() -> impl IntoView {
                         }
                     />
                 </div>
-                <div class="sticky top-24 self-start w-1/3">
+                <div class="sticky top-24 z-0 self-start w-1/3">
                     <FilterBar/>
                 </div>
             </div>

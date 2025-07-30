@@ -7,7 +7,7 @@ use icondata as i;
 #[component]
 pub fn Header() -> impl IntoView { 
     view! {
-        <header class="sticky top-0">
+        <header class="sticky top-0 z-50">
             <nav class="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm shadow-sm z-30">
                 <div id="navleft" class="flex items-center space-x-12">
                     <Favicon/>
