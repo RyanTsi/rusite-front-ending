@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use icondata as i;
-use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{use_app, FilterBarState}, utils::format_date_cn};
+use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{self, *}, utils::format_date_cn};
 
 #[component]
 fn Card(
@@ -275,11 +275,11 @@ pub fn FilterBarCard(
         <Card>
             <p>Select:</p>
             // 显示已选择的tags
-            <Show when=move || !state.get().selected_tags.get().is_empty()>
+            <Show when=move || !state.get().selected_tags.is_empty()>
                 <div class="mb-4">
                     <div class="flex flex-wrap gap-2 mt-2">
                         <For 
-                            each={ move || state.get().selected_tags.get().into_iter().collect::<Vec<_>>() }
+                            each={move || state.get().selected_tags.into_iter().collect::<Vec<_>>() }
                             key=move |tag: &String| tag.clone()
                             children=move |tag| {
                                 let tag_name = tag.clone();
@@ -298,34 +298,35 @@ pub fn FilterBarCard(
                     </div>
                 </div>
             </Show>
-            <Show when=move || !state.get().selected_categories.get().is_empty()>
-                <div class="mb-4">
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        <For 
-                            each={ move || state.get().selected_categories.get().into_iter().collect::<Vec<_>>() }
-                            key=move |category: &String| category.clone()
-                            children=move |category| {
-                                let category_name = category.clone();
-                                let category_name_clone = category.clone();
-                                view! {
-                                    <Button
-                                        on_click=Callback::new(move |_| {
-                                            state.get().remove_category(category_name_clone.clone());
-                                        })
-                                    >
-                                        {category_name}
-                                    </Button>
-                                }
-                            }
-                        />
-                    </div>
-                </div>
-            </Show>
+            // <Show when= || !state.selected_categories.get().is_empty()>
+            //     <div class="mb-4">
+            //         <div class="flex flex-wrap gap-2 mt-2">
+            //             <For 
+            //                 each={ || state.selected_categories.get().into_iter().collect::<Vec<_>>() }
+            //                 key=move |category: &String| category.clone()
+            //                 children= |category| {
+            //                     let category_name = category.clone();
+            //                     let category_name_clone = category.clone();
+            //                     let value = state.clone();
+            //                     view! {
+            //                         <Button
+            //                             on_click=Callback::new(move |_| {
+            //                                 state.remove_category(category_name_clone.clone());
+            //                             })
+            //                         >
+            //                             {category_name}
+            //                         </Button>
+            //                     }
+            //                 }
+            //             />
+            //         </div>
+            //     </div>
+            // </Show>
             <DividingLine/>
             
             <div class="flex flex-wrap gap-4">
                 <For
-                    each=move || state.get().tags.get()
+                    each=move || state.get().tags
                     key=move |tag| tag.name.clone()
                     children=move |tag| {
                         let tag_name = tag.name.clone();
@@ -333,7 +334,8 @@ pub fn FilterBarCard(
                         view! {
                             <Button
                                 on_click=Callback::new(move |_| {
-                                    state.get().switch_tag_selected(tag_name_clone.clone());
+                                    // state.switch_tag_selected(tag_name_clone.clone());
+                                    state.get().add_tag(tag_name_clone.clone())
                                 })
                             >
                                 {tag_name}
@@ -342,26 +344,26 @@ pub fn FilterBarCard(
                     }
                 />
             </div>
-            <DividingLine/>
-            <div class="flex flex-wrap gap-4">
-                <For
-                    each=move || state.get().categories.get()
-                    key=move |category| category.name.clone()
-                    children=move |category| {
-                        let category_name = category.name.clone();
-                        let category_name_clone = category.name.clone();
-                        view! {
-                                <Button
-                                    on_click=Callback::new(move |_| {
-                                        state.get().switch_category_selected(category_name_clone.clone());
-                                    })
-                                >
-                                    {category_name}
-                                </Button>
-                            }
-                        }
-                />
-            </div>
+            // <DividingLine/>
+            // <div class="flex flex-wrap gap-4">
+            //     <For
+            //         each=move || state.categories.get()
+            //         key=move |category| category.name.clone()
+            //         children=move |category| {
+            //             let category_name = category.name.clone();
+            //             let category_name_clone = category.name.clone();
+            //             view! {
+            //                     <Button
+            //                         on_click=Callback::new(move |_| {
+            //                             state.switch_category_selected(category_name_clone.clone());
+            //                         })
+            //                     >
+            //                         {category_name}
+            //                     </Button>
+            //                 }
+            //             }
+            //     />
+            // </div>
         </Card>
     }
 }

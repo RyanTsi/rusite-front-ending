@@ -1,13 +1,12 @@
 use leptos::{ev::{Event, KeyboardEvent}, prelude::*, tachys::renderer::dom::Node};
 
-use crate::state::use_search;
+use crate::state::use_app;
 
 #[component]
 pub fn SearchPanle(
     show: RwSignal<bool>,
 ) -> impl IntoView { 
-    let search_state = use_search();
-
+    let state = use_app();
     let input_element: NodeRef<leptos::html::Input> = NodeRef::new();
     Effect::new(move |_| {
         if let Some(input) = input_element.get() {
@@ -31,7 +30,7 @@ pub fn SearchPanle(
                     type="text"
                     autocomplete="off"
                     placeholder="Search..."
-                    bind:value=search_state.search_query
+                    bind:value=state.search_query
                     node_ref=input_element
                 >
 

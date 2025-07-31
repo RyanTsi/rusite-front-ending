@@ -23,16 +23,13 @@ use crate::{
     },
     state::{
         provide_app_context,
-        provide_search_context,
         use_app,
-        use_search
     }
 };
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    provide_search_context();
     provide_app_context();
 
     let ass = use_app();
