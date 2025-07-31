@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 use crate::utils::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Article {
     info: Arc<ArticleInfo>,
     content: String,
@@ -47,7 +47,7 @@ impl Article {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ArticleInfo {
     pub aid: String,
     pub title: String,
@@ -80,7 +80,7 @@ pub struct ArticleModifyRequest {
     pub secret: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Comment {
     pub cid: String,
     pub uid: String,

@@ -56,37 +56,45 @@ pub struct FilterBarState {
     pub categories: RwSignal<Vec<Category>>,
     pub selected_tags: RwSignal<HashSet<String>>,
     pub selected_categories: RwSignal<HashSet<String>>,
+    pub articles: RwSignal<Vec<Article>>,
+    pub filtered_results: RwSignal<Vec<Article>>,
 }
 
 impl FilterBarState {
     pub fn new() -> Self { 
         Self {
-            tags: RwSignal::new(vec![]),
-            categories: RwSignal::new(vec![]),
+            tags: RwSignal::new(Vec::new()),
+            categories: RwSignal::new(Vec::new()),
             selected_tags: RwSignal::new(HashSet::new()),
             selected_categories: RwSignal::new(HashSet::new()),
+            articles: RwSignal::new(Vec::new()),
+            filtered_results: RwSignal::new(Vec::new()),
         }
     }
     pub fn add_tag(&self, tag: String) {
         self.selected_tags.update(|tags| {
             tags.insert(tag);
         });
+        self.update_filtered_results();
     }
 
     pub fn add_category(&self, category: String) { 
         self.selected_categories.update(|categories| {
             categories.insert(category);
         });
+        self.update_filtered_results();
     }
     pub fn remove_tag(&self, tag: String) {
         self.selected_tags.update(|tags| {
             tags.remove(&tag);
         });
+        self.update_filtered_results();
     }
     pub fn remove_category(&self, category: String) { 
         self.selected_categories.update(|categories| {
             categories.remove(&category);
         });
+        self.update_filtered_results();
     }
     pub fn switch_tag_selected(&self, tag: String) {
         if (self.is_selected_tag(&tag)).get() {
@@ -118,7 +126,28 @@ impl FilterBarState {
             categories.clear();
         });
     }
-
+    pub fn update_filtered_results(&self) { 
+        let selected_tags = self.selected_tags.get();
+        let selected_categories = self.selected_categories.get();
+        let filtered_results = self.articles.get()
+            .into_iter()
+            .filter(|article| {
+                if selected_tags.is_empty() {
+                    true
+                } else {
+                    article.tags().iter().any(|tag| selected_tags.contains(tag))
+                }
+            })
+            .filter(|article| {
+                if selected_categories.is_empty() {
+                    true
+                } else {
+                    article.categories().iter().any(|category| selected_categories.contains(category))
+                }
+            })
+            .collect();
+        self.filtered_results.set(filtered_results);
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -137,7 +166,7 @@ impl AppState {
             active: RwSignal::new(false),
             current_page: RwSignal::new(1),
             items_per_page: RwSignal::new(10),
-            articles: RwSignal::new(vec![]),
+            articles: RwSignal::new(Vec::new()),
             aid_map: RwSignal::new(HashMap::new()),
             filter_bar_state: RwSignal::new(FilterBarState::new()),
         }
@@ -151,9 +180,11 @@ impl AppState {
         }
         let tags = get_tags().await;
         let categories = get_categories().await;
-        self.articles.set(articles);
+        self.articles.set(articles.clone());
         self.filter_bar_state.get().tags.set(tags);
         self.filter_bar_state.get().categories.set(categories);
+        self.filter_bar_state.get().articles.set(articles.clone());
+        self.filter_bar_state.get().update_filtered_results();
     }
     pub fn get_article(&self, aid: String) -> RwSignal<Option<Article>> { 
         let article = self.aid_map.with_untracked(|map| {
