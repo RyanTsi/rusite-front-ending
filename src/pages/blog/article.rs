@@ -3,7 +3,7 @@ use std::cmp::{max, min};
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::{api::blog::{get_article, get_articles_list}, components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBarCard}}, pages::{blog::article, notfound::NotFoundPage}, state::use_app};
+use crate::{components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBarCard}}, pages::notfound::NotFoundPage, state::use_app};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {

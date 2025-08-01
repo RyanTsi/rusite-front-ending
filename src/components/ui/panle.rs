@@ -1,14 +1,20 @@
-use leptos::{ev::{Event, KeyboardEvent}, prelude::*, tachys::renderer::dom::Node};
+use leptos::prelude::*;
 
-use crate::state::use_search;
+use crate::{components::ui::button::Link, state::use_app};
+
 
 #[component]
 pub fn SearchPanle(
     show: RwSignal<bool>,
 ) -> impl IntoView { 
-    let search_state = use_search();
+    let state = use_app();
 
     let input_element: NodeRef<leptos::html::Input> = NodeRef::new();
+    let search_state = state.search_bar_state.get();
+    Effect::new(move |_| { 
+        let _ = search_state.search_query.get();
+        search_state.update_search_results();
+    });
     Effect::new(move |_| {
         if let Some(input) = input_element.get() {
             let _ = input.focus();
@@ -31,11 +37,23 @@ pub fn SearchPanle(
                     type="text"
                     autocomplete="off"
                     placeholder="Search..."
-                    bind:value=search_state.search_query
+                    bind:value=state.search_bar_state.get().search_query
                     node_ref=input_element
                 >
 
                 </input>
+                <For
+                    each=move || state.search_bar_state.get().search_results.get().clone()
+                    key=|article| article.aid().clone()
+                    children=move |article| {
+                        let url = format!("/blog/{}", article.aid());
+                        view! {
+                            <Link href=url on_click=Callback::new(move |_| {show.set(false);} )>
+                                <p> { article.title().to_string() } </p>
+                            </Link>
+                        }
+                    }
+                />
             </div>
         </Show>
     }

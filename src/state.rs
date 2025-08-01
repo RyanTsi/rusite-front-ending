@@ -3,17 +3,17 @@ use leptos::prelude::*;
 use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug)]
-pub struct SearchState {
-    pub all_articles: RwSignal<HashMap<String, Article>>,
+pub struct SearchBarState {
+    pub articles: RwSignal<Vec<Article>>,
     pub search_query: RwSignal<String>,
     pub search_results: RwSignal<Vec<Article>>,
 }
 
-impl SearchState {
+impl SearchBarState {
     pub fn new() -> Self {
-        SearchState {
-            all_articles: RwSignal::new(HashMap::new()),
-            search_query: RwSignal::new("".to_string()),
+        SearchBarState {
+            articles: RwSignal::new(Vec::new()),
+            search_query: RwSignal::new(String::new()),
             search_results: RwSignal::new(Vec::new()),
         }
     }
@@ -21,33 +21,24 @@ impl SearchState {
     // 更新搜索结果
     pub fn update_search_results(&self) {
         let query = self.search_query.get().to_lowercase();
-        let articles = self.all_articles.get();
         
         if query.is_empty() {
             self.search_results.set(Vec::new());
             return;
         }
         
-        let results: Vec<Article> = articles.values()
+        let results: Vec<Article> = self.articles.get()
+            .into_iter()
             .filter(|article| {
                 article.title().to_lowercase().contains(&query) ||
                 article.content().to_lowercase().contains(&query) ||
                 article.tags().iter().any(|tag| tag.to_lowercase().contains(&query))
             })
             .take(10) // 最多显示10条结果
-            .cloned()
             .collect();
         
         self.search_results.set(results);
     }
-}
-
-pub fn provide_search_context() {
-    provide_context(SearchState::new());
-}
-
-pub fn use_search() -> SearchState {
-    use_context::<SearchState>().expect("SearchState should be provided")
 }
 
 #[derive(Clone, Debug)]
@@ -158,6 +149,7 @@ pub struct AppState {
     pub articles: RwSignal<Vec<Article>>,
     pub aid_map: RwSignal<HashMap<String, usize>>,
     pub filter_bar_state: RwSignal<FilterBarState>,
+    pub search_bar_state: RwSignal<SearchBarState>,
 }
 
 impl AppState {
@@ -169,10 +161,12 @@ impl AppState {
             articles: RwSignal::new(Vec::new()),
             aid_map: RwSignal::new(HashMap::new()),
             filter_bar_state: RwSignal::new(FilterBarState::new()),
+            search_bar_state: RwSignal::new(SearchBarState::new()),
         }
     }
     pub async fn load_data(&self) { 
         let articles = get_all_articles_details().await;
+        self.aid_map.update(|map| map.clear());
         for idx in 0..articles.len() {
             self.aid_map.update(|map| {
                 map.insert(articles[idx].aid().clone(), idx);
@@ -185,6 +179,7 @@ impl AppState {
         self.filter_bar_state.get().categories.set(categories);
         self.filter_bar_state.get().articles.set(articles.clone());
         self.filter_bar_state.get().update_filtered_results();
+        self.search_bar_state.get().articles.set(articles.clone());
     }
     pub fn get_article(&self, aid: String) -> RwSignal<Option<Article>> { 
         let article = self.aid_map.with_untracked(|map| {

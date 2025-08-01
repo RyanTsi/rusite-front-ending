@@ -5,7 +5,9 @@ pub fn Link(
     href: String,
     children: Children,
     #[prop(optional, into)]
-    class: String
+    class: String,
+    #[prop(optional, into)]
+    on_click: Option<Callback<ev::MouseEvent>>,
 ) -> impl IntoView { 
     let default_class = "text-gray-700 hover:text-blue-500";
     let current_class = if class.is_empty() {
@@ -13,8 +15,13 @@ pub fn Link(
     } else {
         class.clone()
     };
+    let on_click_handler = move |e: ev::MouseEvent| {
+        if let Some(callback) = on_click {
+            callback.run(e);
+        }
+    };
     view! {
-        <a href=href class=current_class>
+        <a href=href class=current_class on:click=on_click_handler>
             {children()}
         </a>
     }

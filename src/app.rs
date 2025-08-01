@@ -1,15 +1,12 @@
-use std::sync::Arc;
-
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use leptos_router::{
     components::{
-        ParentRoute, Route, Router, Routes
+        Route, Router, Routes
     },
     path
 };
 use crate::{
-    api::blog::get_all_articles_details,
     components::{layout::{
         backdrop::Backdrop, footer::Footer, header::Header
     }, ui::panle::SearchPanle},
@@ -17,22 +14,18 @@ use crate::{
         about::AboutPage,
         blog::{article::{
             ArticleDital,
-            ArticleList
         }, index::BlogIndex}, 
         chat::ChatGroupList, home::HomePage, notfound::NotFoundPage, user::UserProfilePage
     },
     state::{
         provide_app_context,
-        provide_search_context,
         use_app,
-        use_search
     }
 };
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    provide_search_context();
     provide_app_context();
 
     let ass = use_app();
