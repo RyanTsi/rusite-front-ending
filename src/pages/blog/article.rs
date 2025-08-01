@@ -8,7 +8,7 @@ use crate::{api::blog::{get_article, get_articles_list}, components::ui::{button
 #[component]
 pub fn ArticleList() -> impl IntoView {
     let state = use_app();
-    let article_list = Memo::new( move |_| { state.filter_bar_state.get().articles.get() });
+    let article_list = Memo::new( move |_| { state.filter_bar_state.get().filtered_results.get() });
     let current_page = state.current_page;
     let items_per_page = state.items_per_page;
     let total_pages = Memo::new(move |_| {

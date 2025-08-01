@@ -18,4 +18,9 @@ serde_json = "1.0.140"
 leptos_icons = "0.6.1"
 icondata = "0.6.0"
 chrono-tz = "0.10.4"
-web-sys = { version = "0.3.77", features = ["Window"] }
+web-sys = { version = "0.3.77", features = ["Document", "Element", "HtmlElement", "Window"] }
+pulldown-cmark = { version = "0.13.0", features = ["html"] }
+wasm-bindgen = "0.2.100"
+regex = "1.11.1"
+once_cell = "1.21.3"
+serde_yaml = "0.9.34"

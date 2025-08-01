@@ -1,9 +1,7 @@
-use std::collections::HashSet;
-
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use icondata as i;
-use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{use_app, FilterBarState}, utils::format_date_cn};
+use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{use_app, FilterBarState}, utils::{format_date_cn, render_markdown_with_toc}};
 
 #[component]
 fn Card(
@@ -27,12 +25,6 @@ fn Card(
     class: String,
     /// 主体内容
     children: Children,
-    // /// 头部插槽
-    // #[prop(optional)]
-    // header: Option<Box<dyn Fn() -> Fragment>>,
-    // /// 底部插槽
-    // #[prop(optional)]
-    // footer: Option<Box<dyn Fn() -> Fragment>>,
 ) -> impl IntoView {
     // 获取变体类名
     let variant_class = variant.as_class();
@@ -230,6 +222,7 @@ pub fn ArticleInfoCard(
 pub fn ArticleCard(
     article: Article
 ) -> impl IntoView {
+    let (a, _) = render_markdown_with_toc(article.content());
     view! {
         <Card class="flex mx-auto w-2/3 h-screen">
             <div class="flex flex-col gap-4 w-full">
@@ -261,7 +254,7 @@ pub fn ArticleCard(
                 </div>
                 <DividingLine/>
 
-                <p> {article.content().to_string()} </p>
+                <div inner_html={a}></div>
             </div>
         </Card>
     }
@@ -283,11 +276,10 @@ pub fn FilterBarCard(
                             key=move |tag: &String| tag.clone()
                             children=move |tag| {
                                 let tag_name = tag.clone();
-                                let tag_name_clone = tag.clone();
                                 view! {
                                     <Button
                                         on_click=Callback::new(move |_| {
-                                            state.get().remove_tag(tag_name_clone.clone());
+                                            state.get().remove_tag(tag.clone());
                                         })
                                     >
                                         {tag_name}
@@ -306,11 +298,10 @@ pub fn FilterBarCard(
                             key=move |category: &String| category.clone()
                             children=move |category| {
                                 let category_name = category.clone();
-                                let category_name_clone = category.clone();
                                 view! {
                                     <Button
                                         on_click=Callback::new(move |_| {
-                                            state.get().remove_category(category_name_clone.clone());
+                                            state.get().remove_category(category.clone());
                                         })
                                     >
                                         {category_name}
@@ -329,11 +320,10 @@ pub fn FilterBarCard(
                     key=move |tag| tag.name.clone()
                     children=move |tag| {
                         let tag_name = tag.name.clone();
-                        let tag_name_clone = tag.name.clone();
                         view! {
                             <Button
                                 on_click=Callback::new(move |_| {
-                                    state.get().switch_tag_selected(tag_name_clone.clone());
+                                    state.get().switch_tag_selected(tag.name.clone());
                                 })
                             >
                                 {tag_name}
@@ -349,11 +339,10 @@ pub fn FilterBarCard(
                     key=move |category| category.name.clone()
                     children=move |category| {
                         let category_name = category.name.clone();
-                        let category_name_clone = category.name.clone();
                         view! {
                                 <Button
                                     on_click=Callback::new(move |_| {
-                                        state.get().switch_category_selected(category_name_clone.clone());
+                                        state.get().switch_category_selected(category.name.clone());
                                     })
                                 >
                                     {category_name}
