@@ -1,7 +1,9 @@
+use std::{collections::HashSet, hash::Hash};
+
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use icondata as i;
-use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo}, state::FilterBarState, utils::{format_date_cn, render_markdown_with_toc}};
+use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{remove_category, remove_tag, switch_category_selected, switch_tag_selected}, utils::{format_date_cn, render_markdown_with_toc}};
 
 #[component]
 fn Card(
@@ -220,9 +222,15 @@ pub fn ArticleInfoCard(
 
 #[component]
 pub fn ArticleCard(
-    article: Article
+    article: Memo<Option<Article>>
 ) -> impl IntoView {
-    let (a, _) = render_markdown_with_toc(article.content());
+    let (a, _) = article.with(|a| render_markdown_with_toc(a.clone().unwrap().content()));
+    let title = article.get().unwrap().title().to_string();
+    let created_at = article.get().unwrap().created_at();
+    let updated_at = article.get().unwrap().updated_at();
+    let tags = article.get().unwrap().tags().join(" | ");
+    let categories = article.get().unwrap().categories().join(" | ");
+
     view! {
         <Card class="flex mx-auto w-2/3 h-screen">
             <div class="flex flex-col gap-4 w-full">
@@ -231,24 +239,24 @@ pub fn ArticleCard(
                         <Link href="/blog".to_string()>
                             <Icon icon={i::FaChevronLeftSolid}/>
                         </Link>
-                        <h1> {article.title().to_string()} </h1>
+                        <h1> {title} </h1>
                     </div>
                     <div class="flex flex-row items-center gap-8">
                         <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
                             <Icon icon={i::FaCalendarDaysSolid}/>
-                            <p> {article.created_at().to_string()} </p>
+                            <p> {created_at} </p>
                         </div>
                         <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
                             <Icon icon={i::FaCompassDraftingSolid}/>
-                            <p> {article.updated_at().to_string()} </p>
+                            <p> {updated_at} </p>
                         </div>
                         <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
                             <Icon icon={i::FaFolderOpenSolid}/>
-                            <p> {article.tags().join(" | ")} </p>
+                            <p> {tags} </p>
                         </div>
                         <div class="flex flex-row items-center text-sm text-gray-600 gap-2">
                             <Icon icon={i::FaTagsSolid}/>
-                            <p> {article.categories().join(" | ")} </p>
+                            <p> {categories} </p>
                         </div>
                     </div>
                 </div>
@@ -262,24 +270,27 @@ pub fn ArticleCard(
 
 #[component]
 pub fn FilterBarCard(
-    state: RwSignal<FilterBarState>
+    selected_tags: RwSignal<HashSet<String>>,
+    selected_categories: RwSignal<HashSet<String>>,
+    tags: RwSignal<Vec<Tag>>,
+    categories: RwSignal<Vec<Category>>
 ) -> impl IntoView {
     view! {
         <Card>
             <p>Select:</p>
             // 显示已选择的tags
-            <Show when=move || !state.get().selected_tags.get().is_empty()>
+            <Show when=move || !selected_tags.get().is_empty()>
                 <div class="mb-4">
                     <div class="flex flex-wrap gap-2 mt-2">
                         <For 
-                            each={ move || state.get().selected_tags.get().into_iter().collect::<Vec<_>>() }
+                            each={ move || selected_tags.get().into_iter().collect::<Vec<_>>() }
                             key=move |tag: &String| tag.clone()
                             children=move |tag| {
                                 let tag_name = tag.clone();
                                 view! {
                                     <Button
                                         on_click=Callback::new(move |_| {
-                                            state.get().remove_tag(tag.clone());
+                                            remove_tag(selected_tags, tag.clone());
                                         })
                                     >
                                         {tag_name}
@@ -290,18 +301,18 @@ pub fn FilterBarCard(
                     </div>
                 </div>
             </Show>
-            <Show when=move || !state.get().selected_categories.get().is_empty()>
+            <Show when=move || !selected_categories.get().is_empty()>
                 <div class="mb-4">
                     <div class="flex flex-wrap gap-2 mt-2">
                         <For 
-                            each={ move || state.get().selected_categories.get().into_iter().collect::<Vec<_>>() }
+                            each={ move || selected_categories.get().into_iter().collect::<Vec<_>>() }
                             key=move |category: &String| category.clone()
                             children=move |category| {
                                 let category_name = category.clone();
                                 view! {
                                     <Button
                                         on_click=Callback::new(move |_| {
-                                            state.get().remove_category(category.clone());
+                                            remove_category(selected_categories, category.clone());
                                         })
                                     >
                                         {category_name}
@@ -316,14 +327,14 @@ pub fn FilterBarCard(
             
             <div class="flex flex-wrap gap-4">
                 <For
-                    each=move || state.get().tags.get()
+                    each=move || tags.get()
                     key=move |tag| tag.name.clone()
                     children=move |tag| {
                         let tag_name = tag.name.clone();
                         view! {
                             <Button
                                 on_click=Callback::new(move |_| {
-                                    state.get().switch_tag_selected(tag.name.clone());
+                                    switch_tag_selected(selected_tags, tag.name.clone());
                                 })
                             >
                                 {tag_name}
@@ -335,14 +346,14 @@ pub fn FilterBarCard(
             <DividingLine/>
             <div class="flex flex-wrap gap-4">
                 <For
-                    each=move || state.get().categories.get()
+                    each=move || categories.get()
                     key=move |category| category.name.clone()
                     children=move |category| {
                         let category_name = category.name.clone();
                         view! {
                                 <Button
                                     on_click=Callback::new(move |_| {
-                                        state.get().switch_category_selected(category.name.clone());
+                                        switch_category_selected(selected_categories, category.name.clone());
                                     })
                                 >
                                     {category_name}

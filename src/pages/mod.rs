@@ -4,3 +4,4 @@ pub mod chat;
 pub mod user;
 pub mod about;
 pub mod notfound;
+pub mod loading;
