@@ -10,11 +10,6 @@ pub fn SearchPanle(
     let state = use_app();
 
     let input_element: NodeRef<leptos::html::Input> = NodeRef::new();
-    let search_state = state.search_bar_state.get();
-    Effect::new(move |_| { 
-        let _ = search_state.search_query.get();
-        search_state.update_search_results();
-    });
     Effect::new(move |_| {
         if let Some(input) = input_element.get() {
             let _ = input.focus();
@@ -37,13 +32,13 @@ pub fn SearchPanle(
                     type="text"
                     autocomplete="off"
                     placeholder="Search..."
-                    bind:value=state.search_bar_state.get().search_query
+                    bind:value=state.search_query
                     node_ref=input_element
                 >
 
                 </input>
                 <For
-                    each=move || state.search_bar_state.get().search_results.get().clone()
+                    each=move || state.search_results.get()
                     key=|article| article.aid().clone()
                     children=move |article| {
                         let url = format!("/blog/{}", article.aid());

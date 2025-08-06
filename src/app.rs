@@ -15,7 +15,7 @@ use crate::{
         blog::{article::{
             ArticleDital,
         }, index::BlogIndex}, 
-        chat::ChatGroupList, home::HomePage, notfound::NotFoundPage, user::UserProfilePage
+        chat::ChatGroupList, home::index::HomePage, notfound::NotFoundPage, user::UserProfilePage
     },
     state::{
         provide_app_context,
@@ -28,17 +28,17 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
     provide_app_context();
 
-    let ass = use_app();
-    let ass_clone = ass.clone();
+    let state = use_app();
+    let state_clone = state.clone();
     spawn_local(async move {
-        ass_clone.load_data().await;
+        state_clone.load_data().await;
     });
     
     view! {
         <Router>
             <div>
-                <Backdrop show=ass.active />
-                <SearchPanle show=ass.active />
+                <Backdrop show=state.active />
+                <SearchPanle show=state.active />
             </div>
             <Header />
             <div class="flex flex-col bg-gray-100 min-h-screen w-full h-full -z-50 dark:bg-blue-800">

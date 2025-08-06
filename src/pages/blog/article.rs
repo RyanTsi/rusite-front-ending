@@ -3,16 +3,16 @@ use std::cmp::{max, min};
 use leptos::prelude::*;
 use leptos_router::hooks::use_params_map;
 
-use crate::{components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBarCard}}, pages::notfound::NotFoundPage, state::use_app};
+use crate::{components::ui::{button::Button, card::{ArticleCard, ArticleInfoCard, FilterBarCard}}, pages::{loading::LoadingPage, notfound::NotFoundPage}, state::use_app};
 
 #[component]
 pub fn ArticleList() -> impl IntoView {
     let state = use_app();
-    let article_list = Memo::new( move |_| { state.filter_bar_state.get().filtered_results.get() });
     let current_page = state.current_page;
     let items_per_page = state.items_per_page;
+    let article_list = state.filtered_results;
     let total_pages = Memo::new(move |_| {
-        let articles = article_list.get();
+        let articles = state.articles.get();
         articles.len() / items_per_page.get() + (articles.len() % items_per_page.get() > 0) as usize + (articles.len() == 0) as usize
     });
     Effect::new(move |_| {
@@ -117,15 +117,20 @@ fn PageLeader(
 
 #[component]
 pub fn ArticleDital() -> impl IntoView { 
+    
     let params = use_params_map();
     let id = move || params.read().get("id").unwrap_or_default();
     let state = use_app();
     let article = state.get_article(id());
     view! {
+        <Show when=move || !state.loading.get()
+            fallback=move || view! { <LoadingPage /> }
+        >
         <Show when=move || article.get().is_some()
             fallback=move || view! { <NotFoundPage/> }
         >
-            <ArticleCard article=article.get().unwrap()/>
+            <ArticleCard article=article/>
+        </Show>
         </Show>
     }
 }
@@ -135,7 +140,10 @@ pub fn FilterBar() -> impl IntoView {
     let state = use_app();
     view! {
         <FilterBarCard
-            state=state.filter_bar_state
+            tags=state.tags
+            categories=state.categories
+            selected_tags=state.selected_tags
+            selected_categories=state.selected_categories
         />
     }
 }
