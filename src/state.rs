@@ -38,6 +38,10 @@ impl AppState {
             articles,
             aid_map: RwSignal::new(HashMap::new()),
             //
+
+
+
+            
             tags: RwSignal::new(Vec::new()),
             categories: RwSignal::new(Vec::new()),
             selected_tags,
@@ -63,7 +67,17 @@ impl AppState {
         self.categories.set(categories);
         self.loading.update(|v| *v = false);
     }
-    pub fn get_article(&self, aid: String) -> Memo<Option<Article>> {
+    pub fn  
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       get_article(&self, aid: String) -> Memo<Option<Article>> {
         let aid_map = self.aid_map.clone();
         let articles = self.articles.clone();
         Memo::new(move |_| {

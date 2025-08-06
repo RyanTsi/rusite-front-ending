@@ -5,7 +5,6 @@ use crate::{
 use std::error::Error;
 use reqwest::Client;
 
-
 pub async fn fetch_api<T: serde::de::DeserializeOwned>(
     path: &str,
     method: reqwest::Method,

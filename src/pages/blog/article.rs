@@ -119,9 +119,9 @@ fn PageLeader(
 pub fn ArticleDital() -> impl IntoView { 
     
     let params = use_params_map();
-    let id = move || params.read().get("id").unwrap_or_default();
+    let id = Memo::new(move |_| params.with(|params| params.get("id").unwrap_or_default()));
     let state = use_app();
-    let article = state.get_article(id());
+    let article = state.get_article(id.get());
     view! {
         <Show when=move || !state.loading.get()
             fallback=move || view! { <LoadingPage /> }

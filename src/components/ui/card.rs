@@ -1,9 +1,9 @@
-use std::{collections::HashSet, hash::Hash};
+use std::collections::HashSet;
 
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use icondata as i;
-use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{remove_category, remove_tag, switch_category_selected, switch_tag_selected}, utils::{format_date_cn, render_markdown_with_toc}};
+use crate::{components::ui::{button::{Button, Link}, icon::DividingLine}, models::blog::{Article, ArticleInfo, Category, Tag}, state::{remove_category, remove_tag, switch_category_selected, switch_tag_selected}, utils::*};
 
 #[component]
 fn Card(
@@ -224,7 +224,7 @@ pub fn ArticleInfoCard(
 pub fn ArticleCard(
     article: Memo<Option<Article>>
 ) -> impl IntoView {
-    let (a, _) = article.with(|a| render_markdown_with_toc(a.clone().unwrap().content()));
+    let hmt = article.with(|a| parse_markdown(a.clone().unwrap().content()).unwrap());
     let title = article.get().unwrap().title().to_string();
     let created_at = article.get().unwrap().created_at();
     let updated_at = article.get().unwrap().updated_at();
@@ -262,7 +262,7 @@ pub fn ArticleCard(
                 </div>
                 <DividingLine/>
 
-                <div inner_html={a}></div>
+                <div inner_html={hmt.html_content}></div>
             </div>
         </Card>
     }
