@@ -5,7 +5,373 @@
     <title>Rusite</title>
     <link data-trunk rel="css"  href="/public/style.css">
     <link data-trunk rel="copy-dir" href="/public/images"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body);">
+    </script>
+    <style>
+        .math { 
+            color: #e00; /* 公式未渲染时的颜色 */
+            font-family: KaTeX_Main, Times New Roman, serif;
+        }
+        .katex { 
+            font-size: 1.1em; /* 调整公式大小 */
+        }
+    </style> -->
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+            --code-bg: #282c34;
+            --quote-bg: #f8f9fa;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .markdown-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .markdown-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 侧边栏目录样式 */
+        .toc-container {
+            position: sticky;
+            top: 20px;
+            align-self: start;
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .toc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .toc-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .toc-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin: 8px 0;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .toc-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .toc-link {
+            text-decoration: none;
+            color: var(--gray);
+            display: block;
+            transition: var(--transition);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .toc-link:hover {
+            color: var(--primary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .toc-link.active {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        /* Markdown内容区域样式 */
+        .markdown-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        /* 标题样式 */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--secondary);
+            margin: 1.5em 0 0.8em;
+            position: relative;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        h1::before, h2::before, h3::before {
+            content: "#";
+            color: var(--primary);
+            margin-right: 10px;
+            font-weight: normal;
+        }
+
+        /* 段落样式 */
+        p {
+            margin-bottom: 1.2rem;
+        }
+
+        /* 引用样式 */
+        blockquote {
+            background: var(--quote-bg);
+            border-left: 4px solid var(--primary);
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+        }
+
+        blockquote::before {
+            content: """;
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: 0.1;
+            font-family: Georgia, serif;
+        }
+
+        /* 列表样式 */
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 0.7em;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        ol {
+            counter-reset: list-counter;
+        }
+
+        ol li {
+            counter-increment: list-counter;
+        }
+
+        ol li::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: -25px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* 链接样式 */
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        a::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+
+        /* 代码块样式 */
+        pre {
+            background: var(--code-bg);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            overflow: auto;
+            color: #abb2bf;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        pre::before {
+            content: "Code";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 0 0 0 var(--radius);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: rgba(40, 44, 52, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        /* 数学公式样式 */
+        .math {
+            margin: 1.5rem 0;
+        }
+
+        .math.math-inline {
+            display: inline-block;
+            margin: 0 0.2rem;
+            vertical-align: middle;
+        }
+
+        .math.math-display {
+            display: block;
+            text-align: center;
+            margin: 1.5rem auto;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: var(--radius);
+            overflow-x: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .toc-container {
+                position: static;
+                max-height: none;
+                margin-bottom: 20px;
+            }
+            
+            .toc-toggle {
+                display: block;
+            }
+            
+            .toc-list {
+                display: block;
+            }
+            
+            .toc-list.collapsed {
+                display: none;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            h3 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* 页脚样式 */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </body>
 </html>

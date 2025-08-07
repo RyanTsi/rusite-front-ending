@@ -14,13 +14,14 @@ pub fn format_date_cn(date: DateTime<Utc>) -> String {
 
 // 静态正则用于提取 Front Matter
 static FRONT_MATTER_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"(?s)^---\s*\n(.*?)\n---\s*\n(.*)$").unwrap()
+    // Regex::new(r"(?s)^---\s*\n(.*?)\n---\s*\n(.*)$").unwrap()
+    Regex::new(r"(?s)^(?:---\s*\n(.*?)\n---\s*\n)?(.*)$").unwrap()
 });
 
 // 解析 Markdown 内容
 pub fn parse_markdown(content: &str) -> Option<MarkdownContent> {
     // 解析 Front Matter
-    let (front_matter, markdown_content) = parse_front_matter(content)?;
+    let (front_matter, markdown_content) = parse_front_matter(content);
     
     // 生成 TOC 并渲染 HTML
     let (html_content, toc) = render_markdown_with_toc(&markdown_content);
@@ -33,31 +34,36 @@ pub fn parse_markdown(content: &str) -> Option<MarkdownContent> {
 }
 
 // 解析 Front Matter
-fn parse_front_matter(content: &str) -> Option<(FrontMatter, String)> {
-    let captures = FRONT_MATTER_REGEX.captures(content)?;
-    
-    let yaml_str = captures.get(1)?.as_str();
-    let markdown_content = captures.get(2)?.as_str().to_string();
-    
-    // 反序列化 YAML
-    let front_matter: FrontMatter = serde_yaml::from_str(yaml_str)
-        .ok()?;
-    
-    Some((front_matter, markdown_content))
+fn parse_front_matter(content: &str) -> (Option<FrontMatter>, String) {
+    if let Some(captures) = FRONT_MATTER_REGEX.captures(content) {
+        let markdown_content = captures
+            .get(2)
+            .map(|m| m.as_str().to_string())
+            .unwrap_or_else(|| content.to_string());
+
+        // 尝试解析 front matter
+        let front_matter = captures.get(1).and_then(|m| {
+            serde_yaml::from_str(m.as_str()).ok()
+        });
+
+        return (front_matter, markdown_content);
+    }
+    (None, content.to_string())
 }
 
 // 渲染 Markdown 并生成 TOC
 pub fn render_markdown_with_toc(markdown: &str) -> (String, Vec<Heading>) {
     let mut options = Options::empty();
-    options.insert(Options::ENABLE_STRIKETHROUGH);
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_FOOTNOTES);
+    options.insert(Options::ENABLE_STRIKETHROUGH);
+    options.insert(Options::ENABLE_TASKLISTS);
+    options.insert(Options::ENABLE_MATH);
     
     let parser = Parser::new_ext(markdown, options);
     let mut toc = Vec::new();
     let mut html_output = String::new();
     let mut heading_id_counter: HashMap<String, u32> = HashMap::new();
-    
     // 处理事件并生成 TOC
     let events = parser.map(|event| {
         match &event {
@@ -90,7 +96,6 @@ pub fn render_markdown_with_toc(markdown: &str) -> (String, Vec<Heading>) {
                     } else {
                         base_id
                     };
-                    
                     // 替换原始事件以添加 ID
                     return Event::Html(
                         format!("<h{} id=\"{}\">", level, heading.id).into()

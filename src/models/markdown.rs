@@ -13,15 +13,13 @@ pub struct Heading {
 pub struct FrontMatter {
     pub title: String,
     pub date: String,
-    pub author: Option<String>,
-    pub tags: Option<Vec<String>>,
-    pub math_support: Option<bool>,
+    pub tags: Vec<String>,
 }
 
 // Markdown 内容结构
 #[derive(Debug, Clone)]
 pub struct MarkdownContent {
-    pub front_matter: FrontMatter,
+    pub front_matter: Option<FrontMatter>,
     pub html_content: String,
     pub toc: Vec<Heading>,
 }

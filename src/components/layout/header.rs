@@ -26,7 +26,7 @@ pub fn Header() -> impl IntoView {
 fn Favicon() -> impl IntoView { 
     view! {
         <div>
-            <img src="images/favicon.ico" alt="logo" class="h-12 w-12"/>
+            <img src="images/favicon.ico" alt="logo" class="h-8 w-8"/>
         </div>
     }
 }
